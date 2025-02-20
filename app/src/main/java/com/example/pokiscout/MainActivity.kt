@@ -24,12 +24,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             PokiScoutTheme {
                 val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = "HomeScreen1" , builder = {
-                        composable ("HomeScreen1",){
+                NavHost(navController = navController, startDestination = PokiRoutes.HomeScreen , builder = {
+                        composable (PokiRoutes.HomeScreen,){
                             HomeScreen(navController)
 
                         }
-                    composable ("aboutUS",){
+                    composable (PokiRoutes.aboutUS,){
                         aboutUS()
 
                     }

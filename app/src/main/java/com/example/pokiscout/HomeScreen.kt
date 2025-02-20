@@ -60,7 +60,7 @@ fun HomeScreen(navController:NavController) {
                 modifier = Modifier
                     .offset(x = 25.dp, y = 50.dp)
                     .clickable {
-                        navController.navigate("aboutUS")
+                        navController.navigate(PokiRoutes.aboutUS)
 
                     },
                 style = TextStyle(
