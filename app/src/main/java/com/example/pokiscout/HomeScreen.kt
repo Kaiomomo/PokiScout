@@ -32,9 +32,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(navController:NavController) {
     var textFieldState by remember {
         mutableStateOf("")
     }
@@ -59,6 +60,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .offset(x = 25.dp, y = 50.dp)
                     .clickable {
+                        navController.navigate("aboutUS")
 
                     },
                 style = TextStyle(
