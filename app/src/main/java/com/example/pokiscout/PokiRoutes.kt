@@ -4,5 +4,6 @@ object PokiRoutes {
 
     var HomeScreen = "HomeScreen1"
     var aboutUS = "aboutUS"
+    var LogIn = "LogIn"
 
 }

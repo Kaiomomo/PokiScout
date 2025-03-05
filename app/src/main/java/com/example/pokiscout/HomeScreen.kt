@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController:NavController) {
     var textFieldState by remember {
@@ -74,7 +76,7 @@ fun HomeScreen(navController:NavController) {
                 modifier = Modifier
                     .offset(x = 345.dp, y = 50.dp)
                     .clickable {
-
+                        navController.navigate(PokiRoutes.LogIn)
                     },
                 color = Color.Red,
                 style = TextStyle(
@@ -119,7 +121,7 @@ fun HomeScreen(navController:NavController) {
                 contentDescription = "FaceBookLogo",
                 modifier = Modifier
                     .size(25.dp)
-                    .offset(x = 320.dp, y = -10.dp)
+                    .offset(x = 320.dp, y = -9.dp)
                     .clickable {
                     }
             )
@@ -152,6 +154,10 @@ fun HomeScreen(navController:NavController) {
                     .fillMaxWidth()
                     .padding(16.dp) ,
                     shape = RoundedCornerShape(50.dp),
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                )
 
                 )
 

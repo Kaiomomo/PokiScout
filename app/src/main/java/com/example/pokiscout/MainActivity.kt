@@ -27,12 +27,17 @@ class MainActivity : ComponentActivity() {
                 NavHost(navController = navController, startDestination = PokiRoutes.HomeScreen , builder = {
                         composable (PokiRoutes.HomeScreen,){
                             HomeScreen(navController)
-
                         }
+
                     composable (PokiRoutes.aboutUS,){
-                        aboutUS()
+                        aboutUS(navController)
 
                     }
+                    composable (PokiRoutes.LogIn,){
+                        LogIn(navController)
+
+                    }
+
                 } )
 
 
