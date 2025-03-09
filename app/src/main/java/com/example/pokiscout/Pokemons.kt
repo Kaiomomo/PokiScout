@@ -8,5 +8,5 @@ data class Pokemons(
     @PrimaryKey val name: String,
     val ability: String,
     val location: String,
-    val games: String
-)
+    val games: String,
+    )
