@@ -41,15 +41,17 @@ class MainActivity : ComponentActivity() {
                             navArgument("name") { type = NavType.StringType; defaultValue = "Unknown" },
                             navArgument("ability") { type = NavType.StringType; defaultValue = "Unknown" },
                             navArgument("location") { type = NavType.StringType; defaultValue = "Unknown" },
-                            navArgument("games") { type = NavType.StringType; defaultValue = "Unknown" }
+                            navArgument("games") { type = NavType.StringType; defaultValue = "Unknown" } ,
+                            navArgument("imageResId") { type = NavType.IntType; defaultValue = 0 }
                         )
                     ) { backStackEntry ->
                         val name = backStackEntry.arguments?.getString("name") ?: "Unknown"
                         val ability = backStackEntry.arguments?.getString("ability") ?: "Unknown"
                         val location = backStackEntry.arguments?.getString("location") ?: "Unknown"
                         val games = backStackEntry.arguments?.getString("games") ?: "Unknown"
+                        val imageResId = backStackEntry.arguments?.getInt("imageResId") ?: R.drawable.pika
 
-                        PokemonDetailScreen(navController,name, ability, location, games)
+                        PokemonDetailScreen(navController,name, ability, location, games, imageResId)
                     }
 
                     composable(PokiRoutes.aboutUS) {
