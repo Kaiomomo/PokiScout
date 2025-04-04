@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -40,16 +41,25 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.pokiscout.db.PokemonDatabase
+import com.example.pokiscout.utils.SessionManager.saveLoggedInUser
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LogIn(navController: NavController) {
+fun LogIn(navController: NavController, database: PokemonDatabase) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
 
-    val icon = if(passwordVisibility)
-        painterResource(id=R.drawable.visibilityoff)
-    else painterResource( id=R.drawable.visibility)
+    val context = LocalContext.current
+    val icon = if (passwordVisibility)
+        painterResource(id = R.drawable.visibilityoff)
+    else
+        painterResource(id = R.drawable.visibility)
 
     Box(
         modifier = Modifier
@@ -73,18 +83,18 @@ fun LogIn(navController: NavController) {
                     contentDescription = "Masterball",
                     modifier = Modifier
                         .size(150.dp)
-                        .offset(y=-110.dp),
+                        .offset(y = -110.dp),
                 )
 
-                Text(text="Welcome Back",fontSize=28.sp, fontWeight = FontWeight.Bold,
-                    modifier=Modifier
-                        .offset(y=-100.dp)
-
+                Text(
+                    text = "Welcome Back",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.offset(y = -100.dp)
                 )
-                Text(text = "Login to your account",
-                    modifier=Modifier
-                        .offset(y = -100.dp)
-
+                Text(
+                    text = "Login to your account",
+                    modifier = Modifier.offset(y = -100.dp)
                 )
 
                 Text("Username*", modifier = Modifier.align(Alignment.Start))
@@ -103,33 +113,30 @@ fun LogIn(navController: NavController) {
                         unfocusedIndicatorColor = Color.Transparent
                     )
                 )
+
                 Text("Password*", modifier = Modifier.align(Alignment.Start))
                 TextField(
                     value = password,
                     onValueChange = { password = it },
                     label = { Text("PASSWORD") },
                     trailingIcon = {
-                        IconButton(onClick = {
-                            passwordVisibility = !passwordVisibility
-                        },
-                            modifier = Modifier.padding(end=20.dp)) {
-                            Icon(modifier = Modifier
-                                .size(30.dp),
-                                    painter = icon,
-
-                                    contentDescription = "Visiblity Icon",
+                        IconButton(
+                            onClick = { passwordVisibility = !passwordVisibility },
+                            modifier = Modifier.padding(end = 20.dp)
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(30.dp),
+                                painter = icon,
+                                contentDescription = "Visibility Icon",
                             )
                         }
-
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
                     shape = RoundedCornerShape(12.dp),
-
                     singleLine = true,
-                    visualTransformation = if(passwordVisibility) VisualTransformation.None
-                    else PasswordVisualTransformation(),
+                    visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
                     colors = TextFieldDefaults.textFieldColors(
                         containerColor = Color.White,
                         focusedIndicatorColor = Color.Transparent,
@@ -155,8 +162,21 @@ fun LogIn(navController: NavController) {
                 Button(
                     onClick = {
                         if (username.isNotBlank() && password.isNotBlank()) {
-                            navController.navigate(PokiRoutes.HomeScreen) {
-                                popUpTo(PokiRoutes.LogIn) { inclusive = true }
+                            CoroutineScope(Dispatchers.IO).launch {
+                                val user = database.userDao().authenticateUser(username, password)
+                                if (user != null) {
+                                    saveLoggedInUser(context, username)
+                                    withContext(Dispatchers.Main) {
+                                        navController.navigate(PokiRoutes.HomeScreen) {
+                                            popUpTo(PokiRoutes.LogIn) { inclusive = true }
+                                        }
+                                    }
+                                } else {
+                                    withContext(Dispatchers.Main) {
+                                        println("Invalid username or password")
+                                        // Optional: UI feedback
+                                    }
+                                }
                             }
                         } else {
                             println("Username or password is empty")
@@ -182,15 +202,8 @@ fun LogIn(navController: NavController) {
                         textDecoration = TextDecoration.Underline
                     )
                 )
-
-
-
-
             }
-
         }
-
     }
 }
-
 

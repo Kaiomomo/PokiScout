@@ -14,19 +14,22 @@ class MainApplication : Application() {
             applicationContext,
             PokemonDatabase::class.java,
             "pokemon_database"
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     override fun onCreate() {
         super.onCreate()
 
         CoroutineScope(Dispatchers.IO).launch {
-            val PokemonDao = database.pokemonDao()
+            val pokemonDao = database.pokemonDao()
             database.clearAllTables()
 
             insertSampleData()
         }
     }
+
     private suspend fun insertSampleData() {
         val pokemonDao = database.pokemonDao()
 
@@ -42,10 +45,10 @@ class MainApplication : Application() {
         }
 
         if (pokemonDao.getPokemonByName("Pikachu") == null) {
-            pokemonDao.insertPokemon(Pokemons("Pikachu", "Static", "Kanto", "Yellow"))
+            pokemonDao.insertPokemon(
+                Pokemons("Pikachu", "Static", "Kanto", "Yellow")
+            )
         }
     }
 }
-
-
 
