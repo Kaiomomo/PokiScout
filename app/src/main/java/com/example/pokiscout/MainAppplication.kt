@@ -21,19 +21,26 @@ class MainApplication : Application() {
         super.onCreate()
 
         CoroutineScope(Dispatchers.IO).launch {
+            val PokemonDao = database.pokemonDao()
+            database.clearAllTables()
+
             insertSampleData()
         }
     }
-
     private suspend fun insertSampleData() {
         val pokemonDao = database.pokemonDao()
 
-        // Check if Charizard already exists
         if (pokemonDao.getPokemonByName("Charizard") == null) {
-            pokemonDao.insertPokemon(Pokemons("Charizard", "Blaze", "Kanto", "Red, Blue"))
+            pokemonDao.insertPokemon(
+                Pokemons(
+                    "Charizard",
+                    "Blaze\nSolar Power",
+                    "Kanto Region",
+                    "Red (starter pokemon),\nBlue (starter pokemon),\nX and Y (Second Starter)"
+                )
+            )
         }
 
-        // Check if Pikachu already exists
         if (pokemonDao.getPokemonByName("Pikachu") == null) {
             pokemonDao.insertPokemon(Pokemons("Pikachu", "Static", "Kanto", "Yellow"))
         }
