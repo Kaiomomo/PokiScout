@@ -65,6 +65,7 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation("io.ktor:ktor-client-android:2.3.3")
+    implementation ("androidx.datastore:datastore-preferences:1.0.0")
 
     implementation("io.ktor:ktor-client-cio:2.3.3")
     implementation("io.ktor:ktor-client-json:2.3.3")

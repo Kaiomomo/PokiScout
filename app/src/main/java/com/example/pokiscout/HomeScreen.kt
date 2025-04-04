@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -21,6 +22,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -28,10 +30,33 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.pokiscout.db.PokemonDatabase
+import com.example.pokiscout.utils.SessionManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+private fun performSearch(
+    query: String,
+    database: PokemonDatabase,
+    callback: (Pokemons?, Int?, Boolean) -> Unit
+) {
+    CoroutineScope(Dispatchers.IO).launch {
+        val result = database.pokemonDao().getPokemonByName(query)
+        val imageRes = when (query.lowercase()) {
+            "charizard" -> R.drawable.charizard
+            "pikachu" -> R.drawable.pikachu
+            else -> R.drawable.instagramlogo
+        }
+
+        withContext(Dispatchers.Main) {
+            if (result != null) {
+                callback(result, imageRes, false)
+            } else {
+                callback(null, null, true)
+            }
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,6 +64,11 @@ fun HomeScreen(navController: NavController, database: PokemonDatabase) {
     var textFieldState by remember { mutableStateOf("") }
     var searchResult by remember { mutableStateOf<Pokemons?>(null) }
     var showError by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    val loggedInUser by produceState<String?>(initialValue = null) {
+        value = SessionManager.getLoggedInUser(context)
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -59,9 +89,15 @@ fun HomeScreen(navController: NavController, database: PokemonDatabase) {
                     style = TextStyle(fontWeight = FontWeight.Bold)
                 )
                 Text(
-                    text = "LOG IN",
-                    modifier = Modifier.clickable { navController.navigate(PokiRoutes.LogIn) },
-                    color = Color.Red,
+                    text = if (loggedInUser != null) "PROFILE" else "LOG IN",
+                    modifier = Modifier.clickable {
+                        if (loggedInUser != null) {
+                            navController.navigate(PokiRoutes.Profile)
+                        } else {
+                            navController.navigate(PokiRoutes.LogIn)
+                        }
+                    },
+                    color = if (loggedInUser != null) Color.Green else Color.Red,
                     style = TextStyle(fontWeight = FontWeight.Bold)
                 )
             }
@@ -124,7 +160,7 @@ fun HomeScreen(navController: NavController, database: PokemonDatabase) {
                         imageVector = Icons.Default.Search,
                         contentDescription = "Search Icon",
                         modifier = Modifier.clickable {
-                            performSearch(textFieldState, database) { result, imageRes,error ->
+                            performSearch(textFieldState, database) { result, imageRes, error ->
                                 if (result != null && imageRes != null) {
                                     searchResult = result
                                     navController.navigate(
@@ -145,19 +181,17 @@ fun HomeScreen(navController: NavController, database: PokemonDatabase) {
                             modifier = Modifier.clickable { textFieldState = "" }
                         )
                     }
-
                 },
-
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Search
                 ),
                 keyboardActions = KeyboardActions(
                     onSearch = {
-                        performSearch(textFieldState, database) { result, imageRes,error ->
+                        performSearch(textFieldState, database) { result, imageRes, error ->
                             if (result != null && imageRes != null) {
                                 searchResult = result
                                 navController.navigate(
-                                    "details_screen/${result.name}/${result.ability}/${result.location}/${result.games}/${imageRes}"
+                                    "details_screen/${result.name}/${result.ability}/${result.location}/${result.games}/$imageRes"
                                 )
                             } else {
                                 showError = error
@@ -178,8 +212,9 @@ fun HomeScreen(navController: NavController, database: PokemonDatabase) {
             Image(
                 painter = painterResource(id = R.drawable.pika),
                 contentDescription = "Pikachu",
-                modifier = Modifier.size(50.dp)
-                    .offset(y=-115.dp)
+                modifier = Modifier
+                    .size(50.dp)
+                    .offset(y = -115.dp)
             )
 
             if (showError) {
@@ -187,29 +222,6 @@ fun HomeScreen(navController: NavController, database: PokemonDatabase) {
                     text = "No Pokémon found!",
                     color = Color.Red
                 )
-            }
-        }
-    }
-}
-
-private fun performSearch(
-    query: String,
-    database: PokemonDatabase,
-    callback: (Pokemons?, Int?, Boolean) -> Unit
-) {
-    CoroutineScope(Dispatchers.IO).launch {
-        val result = database.pokemonDao().getPokemonByName(query)
-        val imageRes = when (query.lowercase()) {
-            "charizard" -> R.drawable.charizard
-            "pikachu" -> R.drawable.pikachu
-            else -> R.drawable.instagramlogo
-        }
-
-        withContext(Dispatchers.Main) {
-            if (result != null) {
-                callback(result, imageRes, false)
-            } else {
-                callback(null, null, true)
             }
         }
     }

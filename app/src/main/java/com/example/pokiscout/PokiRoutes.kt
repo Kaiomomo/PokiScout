@@ -6,6 +6,7 @@ object PokiRoutes {
     var aboutUS = "aboutUS"
     var LogIn = "LogIn"
     const val CreateAccount = "create_account"
+    const val Profile = "profile"
 
 
 

@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -20,15 +21,23 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.pokiscout.PokiRoutes
 import com.example.pokiscout.R
+import com.example.pokiscout.User
+import com.example.pokiscout.db.PokemonDatabase
+import com.example.pokiscout.utils.SessionManager.saveLoggedInUser
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateAccountScreen(navController: NavController) {
+fun CreateAccountScreen(navController: NavController, database: PokemonDatabase) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
     val icon = if (showPassword)
         painterResource(id = R.drawable.visibilityoff)
     else
@@ -118,8 +127,21 @@ fun CreateAccountScreen(navController: NavController) {
                 Button(
                     onClick = {
                         if (username.isNotBlank() && password == confirmPassword) {
-                            navController.navigate(PokiRoutes.HomeScreen) {
-                                popUpTo(PokiRoutes.LogIn) { inclusive = true }
+                            CoroutineScope(Dispatchers.IO).launch {
+                                try {
+                                    database.userDao().insertUser(User(username, password))
+                                    saveLoggedInUser(context, username)
+
+                                    withContext(Dispatchers.Main) {
+                                        navController.navigate(PokiRoutes.HomeScreen) {
+                                            popUpTo(PokiRoutes.LogIn) { inclusive = true }
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    withContext(Dispatchers.Main) {
+                                        println("Username already exists")
+                                    }
+                                }
                             }
                         } else {
                             println("Invalid input or passwords don't match")
@@ -146,3 +168,4 @@ fun CreateAccountScreen(navController: NavController) {
         }
     }
 }
+
