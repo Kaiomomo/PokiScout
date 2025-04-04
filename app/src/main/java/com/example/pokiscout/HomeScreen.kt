@@ -124,11 +124,11 @@ fun HomeScreen(navController: NavController, database: PokemonDatabase) {
                         imageVector = Icons.Default.Search,
                         contentDescription = "Search Icon",
                         modifier = Modifier.clickable {
-                            performSearch(textFieldState, database) { result, error ->
-                                if (result != null) {
+                            performSearch(textFieldState, database) { result, imageRes,error ->
+                                if (result != null && imageRes != null) {
                                     searchResult = result
                                     navController.navigate(
-                                        "details_screen/${result.name}/${result.ability}/${result.location}/${result.games}"
+                                        "details_screen/${result.name}/${result.ability}/${result.location}/${result.games}/$imageRes"
                                     )
                                 } else {
                                     showError = error
@@ -153,11 +153,11 @@ fun HomeScreen(navController: NavController, database: PokemonDatabase) {
                 ),
                 keyboardActions = KeyboardActions(
                     onSearch = {
-                        performSearch(textFieldState, database) { result, error ->
-                            if (result != null) {
+                        performSearch(textFieldState, database) { result, imageRes,error ->
+                            if (result != null && imageRes != null) {
                                 searchResult = result
                                 navController.navigate(
-                                    "details_screen/${result.name}/${result.ability}/${result.location}/${result.games}"
+                                    "details_screen/${result.name}/${result.ability}/${result.location}/${result.games}/${imageRes}"
                                 )
                             } else {
                                 showError = error
@@ -195,15 +195,21 @@ fun HomeScreen(navController: NavController, database: PokemonDatabase) {
 private fun performSearch(
     query: String,
     database: PokemonDatabase,
-    callback: (Pokemons?, Boolean) -> Unit
+    callback: (Pokemons?, Int?, Boolean) -> Unit
 ) {
     CoroutineScope(Dispatchers.IO).launch {
         val result = database.pokemonDao().getPokemonByName(query)
+        val imageRes = when (query.lowercase()) {
+            "charizard" -> R.drawable.charizard
+            "pikachu" -> R.drawable.pikachu
+            else -> R.drawable.instagramlogo
+        }
+
         withContext(Dispatchers.Main) {
             if (result != null) {
-                callback(result, false)
+                callback(result, imageRes, false)
             } else {
-                callback(null, true)
+                callback(null, null, true)
             }
         }
     }

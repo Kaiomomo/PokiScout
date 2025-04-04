@@ -18,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.pokiscout.db.PokemonDatabase
+import com.example.pokiscout.ui.theme.CreateAccountScreen
 import com.example.pokiscout.ui.theme.PokiScoutTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,19 +32,22 @@ class MainActivity : ComponentActivity() {
                 NavHost(
                     navController = navController,
                     startDestination = PokiRoutes.HomeScreen
-                ) {
+                )
+                {
                     composable(PokiRoutes.HomeScreen) {
                         HomeScreen(navController = navController, database = database)
                     }
+
                     composable(
-                        "details_screen/{name}/{ability}/{location}/{games}",
+                        "details_screen/{name}/{ability}/{location}/{games}/{imageResId}",
                         arguments = listOf(
                             navArgument("name") { type = NavType.StringType; defaultValue = "Unknown" },
                             navArgument("ability") { type = NavType.StringType; defaultValue = "Unknown" },
                             navArgument("location") { type = NavType.StringType; defaultValue = "Unknown" },
-                            navArgument("games") { type = NavType.StringType; defaultValue = "Unknown" } ,
-                            navArgument("imageResId") { type = NavType.IntType; defaultValue = 0 }
+                            navArgument("games") { type = NavType.StringType; defaultValue = "Unknown" },
+                            navArgument("imageResId") { type = NavType.IntType; defaultValue = R.drawable.pika }
                         )
+
                     ) { backStackEntry ->
                         val name = backStackEntry.arguments?.getString("name") ?: "Unknown"
                         val ability = backStackEntry.arguments?.getString("ability") ?: "Unknown"
@@ -51,8 +55,10 @@ class MainActivity : ComponentActivity() {
                         val games = backStackEntry.arguments?.getString("games") ?: "Unknown"
                         val imageResId = backStackEntry.arguments?.getInt("imageResId") ?: R.drawable.pika
 
-                        PokemonDetailScreen(navController,name, ability, location, games, imageResId)
+
+                        PokemonDetailScreen(navController, name, ability, location, games, imageResId)
                     }
+
 
                     composable(PokiRoutes.aboutUS) {
                         aboutUS(navController)
@@ -61,6 +67,10 @@ class MainActivity : ComponentActivity() {
                     composable(PokiRoutes.LogIn) {
                         LogIn(navController)
                     }
+                    composable(PokiRoutes.CreateAccount) {
+                        CreateAccountScreen(navController = navController)
+                    }
+
                 }
             }
         }
