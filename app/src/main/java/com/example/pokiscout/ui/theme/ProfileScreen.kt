@@ -99,7 +99,7 @@ fun ProfileScreen(navController: NavController, database: PokemonDatabase) {
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text("Save Changes")
+                Text("Save Changess")
             }
 
             Button(
