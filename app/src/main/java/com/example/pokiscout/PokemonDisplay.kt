@@ -18,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -42,111 +43,102 @@ fun PokemonDetailScreen(
     imageRes: Int
 ) {
     val backgroundColor = if (name == "Pikachu") Color(0xFFFFFF99) else Color(0xFFFFCDD2)
+
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(11.dp)
+            .fillMaxSize()
+            .padding(16.dp)
             .shadow(10.dp, RoundedCornerShape(16.dp)),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFB42020))
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(backgroundColor)
-                .padding(16.dp)
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(backgroundColor)
+                    .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item {
-                    if (name == "Charizard") {
-                        Image(
-                            painter = painterResource(id = imageRes),
-                            contentDescription = "$name Image",
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                    Text(
+                        text = name,
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-                        Text(
-                            text = "$name",
-                            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 24.sp),
-                            textAlign = TextAlign.Center
-                        )
-                        Text(
-                            text = "Ability: $ability",
-                            fontSize = 19.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(text = location, fontSize = 16.sp)
-                        Text(text = "Games found in: $games", fontSize = 16.sp)
+                    Image(
+                        painter = painterResource(id = imageRes),
+                        contentDescription = "$name Image",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                    )
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                    DetailRow(label = "Ability", value = ability)
+                    DetailRow(label = "Location", value = location)
+                    DetailRow(label = "Games", value = games)
+                }
 
+                if (name.equals("Charizard", ignoreCase = true)) {
+                    item {
                         Text(
                             text = "Evolutions",
-                            fontSize = 19.sp,
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
+                            modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center
                         )
+
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 12.dp),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.charmander_charizard),
-                                contentDescription = "Charmander to Charizard",
-                                modifier = Modifier
-                                    .size(100.dp)
-                                    .clip(CircleShape)
-                                    .border(4.dp, Color.White, CircleShape)
-                            )
-                            Image(
-                                painter = painterResource(id = R.drawable.charmealon_charizard),
-                                contentDescription = "Charmeleon to Charizard",
-                                modifier = Modifier
-                                    .size(100.dp)
-                                    .clip(CircleShape)
-                                    .border(4.dp, Color.White, CircleShape)
-                            )
+                            listOf(
+                                R.drawable.charmander_charizard to "Charmander",
+                                R.drawable.charmealon_charizard to "Charmeleon"
+                            ).forEach { (image, desc) ->
+                                Image(
+                                    painter = painterResource(id = image),
+                                    contentDescription = desc,
+                                    modifier = Modifier
+                                        .size(100.dp)
+                                        .clip(CircleShape)
+                                        .border(3.dp, Color.White, CircleShape)
+                                )
+                            }
                         }
                     }
                 }
 
-                item {
-                    if (name == "Pikachu") {
+                if (name.equals("Pikachu", ignoreCase = true)) {
+                    item {
                         Text(
-                            text = "Pikachu",
-                            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 24.sp),
-                            modifier = Modifier.fillMaxWidth()
-                                .offset(y = 50.dp),
+                            text = "Special Appearance",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center
-                        )
-
-                        Image(
-                            painter = painterResource(id = imageRes),
-                            contentDescription = "$name Image",
-                            modifier = Modifier.fillMaxWidth()
-                                .offset(y = 60.dp, x = 20.dp)
-                        )
-                        Text(
-                            text = "Location",
-                            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 24.sp),
-                            modifier = Modifier
-                                .offset(x = 145.dp, y = 120.dp)
                         )
 
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .offset(x = -20.dp, y = 140.dp)
-                                .shadow(12.dp, RoundedCornerShape(16.dp))
+                                .padding(vertical = 12.dp)
                                 .clip(RoundedCornerShape(16.dp))
-                                .padding(8.dp)
+                                .shadow(8.dp, RoundedCornerShape(16.dp))
+                                .background(Color.White)
+                                .padding(12.dp),
+                            contentAlignment = Alignment.Center
                         ) {
                             Image(
                                 painter = painterResource(R.drawable.pokemon_yellow),
                                 contentDescription = "Pokemon Yellow Pikachu",
-                                modifier = Modifier.size(100.dp)
+                                modifier = Modifier.size(120.dp)
                             )
                         }
                     }
@@ -157,9 +149,28 @@ fun PokemonDetailScreen(
                 imageVector = Icons.Default.Close,
                 contentDescription = "Exit",
                 modifier = Modifier
+                    .align(Alignment.TopEnd)
                     .padding(16.dp)
                     .clickable { navController.popBackStack() }
             )
         }
     }
 }
+
+@Composable
+fun DetailRow(label: String, value: String) {
+    Column(modifier = Modifier.padding(vertical = 4.dp)) {
+        Text(
+            text = "$label:",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = Color.DarkGray
+        )
+        Text(
+            text = value,
+            fontSize = 16.sp,
+            color = Color.Black
+        )
+    }
+}
+

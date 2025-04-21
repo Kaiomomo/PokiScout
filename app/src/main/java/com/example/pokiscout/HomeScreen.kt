@@ -1,62 +1,29 @@
 package com.example.pokiscout
+
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.pokiscout.db.PokemonDatabase
-import com.example.pokiscout.utils.SessionManager
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-private fun performSearch(
-    query: String,
-    database: PokemonDatabase,
-    callback: (Pokemons?, Int?, Boolean) -> Unit
-) {
-    CoroutineScope(Dispatchers.IO).launch {
-        val result = database.pokemonDao().getPokemonByName(query)
-        val imageRes = when (query.lowercase()) {
-            "charizard" -> R.drawable.charizard
-            "pikachu" -> R.drawable.pikachu
-            else -> R.drawable.instagramlogo
-        }
-
-        withContext(Dispatchers.Main) {
-            if (result != null) {
-                callback(result, imageRes, false)
-            } else {
-                callback(null, null, true)
-            }
-        }
-    }
-}
+import kotlinx.coroutines.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,11 +31,6 @@ fun HomeScreen(navController: NavController, database: PokemonDatabase) {
     var textFieldState by remember { mutableStateOf("") }
     var searchResult by remember { mutableStateOf<Pokemons?>(null) }
     var showError by remember { mutableStateOf(false) }
-
-    val context = LocalContext.current
-    val loggedInUser by produceState<String?>(initialValue = null) {
-        value = SessionManager.getLoggedInUser(context)
-    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -81,7 +43,9 @@ fun HomeScreen(navController: NavController, database: PokemonDatabase) {
             ) {
                 Text(
                     text = "ABOUT US",
-                    modifier = Modifier.clickable { navController.navigate(PokiRoutes.aboutUS) },
+                    modifier = Modifier.clickable {
+                        navController.navigate(PokiRoutes.aboutUS)
+                    },
                     style = TextStyle(fontWeight = FontWeight.Bold)
                 )
                 Text(
@@ -89,15 +53,11 @@ fun HomeScreen(navController: NavController, database: PokemonDatabase) {
                     style = TextStyle(fontWeight = FontWeight.Bold)
                 )
                 Text(
-                    text = if (loggedInUser != null) "PROFILE" else "LOG IN",
+                    text = "LOG IN",
                     modifier = Modifier.clickable {
-                        if (loggedInUser != null) {
-                            navController.navigate(PokiRoutes.Profile)
-                        } else {
-                            navController.navigate(PokiRoutes.LogIn)
-                        }
+                        navController.navigate(PokiRoutes.LogIn)
                     },
-                    color = if (loggedInUser != null) Color.Green else Color.Red,
+                    color = Color.Red,
                     style = TextStyle(fontWeight = FontWeight.Bold)
                 )
             }
@@ -118,25 +78,19 @@ fun HomeScreen(navController: NavController, database: PokemonDatabase) {
                     Image(
                         painter = painterResource(id = R.drawable.linkedin),
                         contentDescription = "LinkedIn",
-                        modifier = Modifier
-                            .size(25.dp)
-                            .clickable { }
+                        modifier = Modifier.size(25.dp).clickable { }
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Image(
                         painter = painterResource(id = R.drawable.facebooklogo),
                         contentDescription = "Facebook",
-                        modifier = Modifier
-                            .size(20.dp)
-                            .clickable { }
+                        modifier = Modifier.size(20.dp).clickable { }
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Image(
                         painter = painterResource(id = R.drawable.instagramlogo),
                         contentDescription = "Instagram",
-                        modifier = Modifier
-                            .size(20.dp)
-                            .clickable { }
+                        modifier = Modifier.size(20.dp).clickable { }
                     )
                 }
             }
@@ -220,12 +174,39 @@ fun HomeScreen(navController: NavController, database: PokemonDatabase) {
             if (showError) {
                 Text(
                     text = "No Pokémon found!",
-                    color = Color.Red
+                    color = Color.Red,
+                    fontSize = 16.sp
                 )
             }
         }
     }
 }
+
+// ✅ Must be defined above or below HomeScreen in same file
+fun performSearch(
+    query: String,
+    database: PokemonDatabase,
+    callback: (Pokemons?, Int?, Boolean) -> Unit
+) {
+    CoroutineScope(Dispatchers.IO).launch {
+        val result = database.pokemonDao().getPokemonByName(query)
+        val imageRes = when (query.lowercase()) {
+            "charizard" -> R.drawable.charizard
+            "pikachu" -> R.drawable.pikachu
+            else -> R.drawable.instagramlogo
+        }
+
+        withContext(Dispatchers.Main) {
+            if (result != null) {
+                callback(result, imageRes, false)
+            } else {
+                callback(null, null, true)
+            }
+        }
+    }
+}
+
+
 
 
 

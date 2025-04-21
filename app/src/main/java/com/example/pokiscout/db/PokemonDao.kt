@@ -14,4 +14,5 @@ interface PokemonDao {
 
     @Query("SELECT * FROM pokemon_table WHERE name LIKE :name LIMIT 1")
     suspend fun getPokemonByName(name: String): Pokemons?
+
 }

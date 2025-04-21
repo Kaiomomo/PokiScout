@@ -130,21 +130,21 @@ fun CreateAccountScreen(navController: NavController, database: PokemonDatabase)
                             CoroutineScope(Dispatchers.IO).launch {
                                 try {
                                     database.userDao().insertUser(User(username, password))
-                                    saveLoggedInUser(context, username)
 
+                                    // ✅ Navigate to LogIn screen after account creation
                                     withContext(Dispatchers.Main) {
-                                        navController.navigate(PokiRoutes.HomeScreen) {
-                                            popUpTo(PokiRoutes.LogIn) { inclusive = true }
+                                        navController.navigate(PokiRoutes.LogIn) {
+                                            popUpTo(PokiRoutes.CreateAccount) { inclusive = true }
                                         }
                                     }
                                 } catch (e: Exception) {
                                     withContext(Dispatchers.Main) {
-                                        println("Username already exists")
+                                        println("❌ Username already exists or DB error")
                                     }
                                 }
                             }
                         } else {
-                            println("Invalid input or passwords don't match")
+                            println("❗ Invalid input or passwords don't match")
                         }
                     },
                     colors = ButtonDefaults.buttonColors(Color.White),
@@ -168,4 +168,5 @@ fun CreateAccountScreen(navController: NavController, database: PokemonDatabase)
         }
     }
 }
+
 
