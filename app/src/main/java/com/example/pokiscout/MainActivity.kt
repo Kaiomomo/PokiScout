@@ -14,6 +14,7 @@ import androidx.navigation.navArgument
 import com.example.pokiscout.db.PokemonDatabase
 import com.example.pokiscout.ui.theme.CreateAccountScreen
 import com.example.pokiscout.ui.theme.PokiScoutTheme
+import com.example.pokiscout.ui.theme.ProfileScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,6 +62,10 @@ class MainActivity : ComponentActivity() {
                     composable(PokiRoutes.CreateAccount) {
                         CreateAccountScreen(navController = navController, database = database)
                     }
+                    composable(PokiRoutes.Profile) {
+                        ProfileScreen(navController = navController, database = database)
+                    }
+
 
 
                 }

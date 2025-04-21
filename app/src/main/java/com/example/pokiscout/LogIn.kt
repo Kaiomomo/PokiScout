@@ -167,19 +167,18 @@ fun LogIn(navController: NavController, database: PokemonDatabase) {
                                 if (user != null) {
                                     saveLoggedInUser(context, username)
                                     withContext(Dispatchers.Main) {
-                                        navController.navigate(PokiRoutes.HomeScreen) {
+                                        navController.navigate(PokiRoutes.Profile) {
                                             popUpTo(PokiRoutes.LogIn) { inclusive = true }
                                         }
                                     }
                                 } else {
                                     withContext(Dispatchers.Main) {
-                                        println("Invalid username or password")
-                                        // Optional: UI feedback
+                                        println("❌ Invalid username or password")
                                     }
                                 }
                             }
                         } else {
-                            println("Username or password is empty")
+                            println("❗ Username or password is empty")
                         }
                     },
                     colors = ButtonDefaults.buttonColors(Color.White),
@@ -195,7 +194,6 @@ fun LogIn(navController: NavController, database: PokemonDatabase) {
                     onClick = {
                         navController.navigate(PokiRoutes.CreateAccount)
                     },
-                    modifier = Modifier.offset(x = 0.dp),
                     style = TextStyle(
                         color = Color.White,
                         fontSize = 14.sp,
