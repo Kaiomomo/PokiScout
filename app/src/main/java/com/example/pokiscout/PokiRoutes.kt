@@ -2,7 +2,7 @@ package com.example.pokiscout
 
 object PokiRoutes {
 
-    var HomeScreen = "HomeScreen1"
+    var HomeScreen = "home"
     var aboutUS = "aboutUS"
     var LogIn = "LogIn"
     const val CreateAccount = "create_account"

@@ -132,7 +132,6 @@ fun aboutUS(navController: NavController) {
 
             }
             Box(
-                //rounded shape for box
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(17.dp)

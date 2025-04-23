@@ -1,6 +1,7 @@
 package com.example.pokiscout
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -71,6 +74,23 @@ fun LogIn(navController: NavController, database: PokemonDatabase) {
             modifier = Modifier.fillMaxSize(),
             containerColor = Color(0xFFA652BB)
         ) { paddingValues ->
+
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Close Log In",
+                tint = Color.White,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .size(28.dp)
+                    .offset(x = -10.dp,y=20.dp)
+                    .clickable {
+                        navController.navigate(PokiRoutes.HomeScreen) {
+                            popUpTo(PokiRoutes.HomeScreen)
+                            launchSingleTop = true
+                        }
+                    }
+            )
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -204,4 +224,5 @@ fun LogIn(navController: NavController, database: PokemonDatabase) {
         }
     }
 }
+
 

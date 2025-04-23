@@ -65,6 +65,9 @@ class MainActivity : ComponentActivity() {
                     composable(PokiRoutes.Profile) {
                         ProfileScreen(navController = navController, database = database)
                     }
+                    composable(PokiRoutes.HomeScreen) {
+                        HomeScreen(navController = navController, database = database)
+                    }
 
 
 
