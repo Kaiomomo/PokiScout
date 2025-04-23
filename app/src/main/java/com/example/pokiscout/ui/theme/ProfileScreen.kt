@@ -1,12 +1,22 @@
 package com.example.pokiscout.ui.theme
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -21,6 +31,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController, database: PokemonDatabase) {
     val context = LocalContext.current
@@ -51,73 +62,110 @@ fun ProfileScreen(navController: NavController, database: PokemonDatabase) {
             Text("Loading profile...", modifier = Modifier.padding(16.dp))
         }
     } else {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp, vertical = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterVertically),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .background(Color(0xFFFFF4B1))
         ) {
-            Text(
-                text = "Your Profile",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold
+
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Close",
+                tint = Color.Red,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .size(32.dp)
+                    .clickable {
+                        navController.navigate(PokiRoutes.HomeScreen) {
+                            popUpTo(0)
+                            launchSingleTop = true
+                        }
+                    }
             )
 
-            TextField(
-                value = username,
-                onValueChange = { username = it },
-                label = { Text("Username") },
-                modifier = Modifier.fillMaxWidth()
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp, vertical = 48.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "🎮 Your Trainer Profile",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color(0xFFB71C1C)
+                )
 
-            TextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Password") },
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth()
-            )
+                TextField(
+                    value = username,
+                    onValueChange = { username = it },
+                    label = { Text("Trainer Name") },
+                    singleLine = true,
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.White,
+                        focusedIndicatorColor = Color(0xFFB71C1C),
+                        unfocusedIndicatorColor = Color.Gray
+                    )
+                )
 
-            Spacer(modifier = Modifier.height(12.dp))
+                TextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Password") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    singleLine = true,
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.White,
+                        focusedIndicatorColor = Color(0xFFB71C1C),
+                        unfocusedIndicatorColor = Color.Gray
+                    )
+                )
 
-            Button(
-                onClick = {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        currentUser?.let {
-                            database.userDao().deleteUserByUsername(it.username)
-                            database.userDao().insertUser(User(username, password))
-                            SessionManager.saveLoggedInUser(context, username)
+                Button(
+                    onClick = {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            currentUser?.let {
+                                database.userDao().deleteUserByUsername(it.username)
+                                database.userDao().insertUser(User(username, password))
+                                SessionManager.saveLoggedInUser(context, username)
 
+                                withContext(Dispatchers.Main) {
+                                    navController.popBackStack()
+                                }
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF5350)) // Red
+                ) {
+                    Text("💾 Save Changes", color = Color.White, fontWeight = FontWeight.Bold)
+                }
+
+                Button(
+                    onClick = {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            SessionManager.logoutUser(context)
                             withContext(Dispatchers.Main) {
-                                navController.popBackStack()
+                                navController.navigate(PokiRoutes.LogIn) {
+                                    popUpTo(PokiRoutes.HomeScreen) { inclusive = true }
+                                }
                             }
                         }
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-            ) {
-                Text("Save Changess")
-            }
-
-            Button(
-                onClick = {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        SessionManager.logoutUser(context)
-                        withContext(Dispatchers.Main) {
-                            navController.navigate(PokiRoutes.LogIn) {
-                                popUpTo(PokiRoutes.HomeScreen) { inclusive = true }
-                            }
-                        }
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-            ) {
-                Text("Log Out")
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
+                ) {
+                    Text("🚪 Log Out", color = Color.White, fontWeight = FontWeight.SemiBold)
+                }
             }
         }
     }
